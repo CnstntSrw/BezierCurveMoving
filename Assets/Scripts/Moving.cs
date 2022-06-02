@@ -12,13 +12,13 @@ namespace Cubes
         [SerializeField]
         private LayerMask LayerMask;
         [SerializeField]
-        private float _Speed;
+        private float _MovementSpeed;
+        [SerializeField]
+        private float _RotationSpeed = 0.01f;
         [SerializeField]
         private List<Transform> _Cubes1;
         [SerializeField]
         private List<Transform> _Cubes2;
-
-        public float _Duration;
 
         private Transform _CurrentDestination;
         private Transform _EndDestinationTransform;
@@ -27,6 +27,7 @@ namespace Cubes
         private Vector3 _StartPosition;
         private BezierCurve _BezierCurve;
         private int _CurveKoeff = 5;
+
         private void Awake()
         {
             _StartPosition = transform.position;
@@ -47,17 +48,16 @@ namespace Cubes
         IEnumerator Move()
         {
             _Progress = 0;
-
+            float _RotationProgress = 0;
             while (transform.position != _CurrentDestination.position)
             {
-                _Progress += Time.deltaTime * _Speed;
+                _Progress += Time.deltaTime * _MovementSpeed;
+                _RotationProgress += Time.deltaTime * _RotationSpeed;
                 Vector3 position = _BezierCurve.GetPoint(_Progress);
                 transform.position = position;
-
-                transform.LookAt(position + _BezierCurve.GetDirection(_Progress));
+                transform.rotation = Quaternion.Slerp(transform.rotation, _CurrentDestination.rotation, _RotationProgress);
                 yield return null;
             }
-            transform.rotation = _CurrentDestination.transform.rotation;
         }
         private bool ChooseDestination(Transform closestToDestinationPosition, ref Transform currentDestination)
         {
@@ -87,7 +87,12 @@ namespace Cubes
                     Transform closestToDestination = FindClosestCube(_EndDestinationTransform);
 
                     NeedAdditionalDestination = ChooseDestination(closestToDestination, ref _CurrentDestination);
-                    _BezierCurve.points = new Vector3[4] { transform.position, new Vector3(transform.position.x + _CurveKoeff, transform.position.y, transform.position.z), _CurrentDestination.position + Vector3.up * _CurveKoeff, _CurrentDestination.position };
+                    _BezierCurve.points = new Vector3[4] 
+                    { transform.position, 
+                        new Vector3(transform.position.x + _CurveKoeff, transform.position.y, transform.position.z),
+                        _CurrentDestination.position + Vector3.up * _CurveKoeff,
+                        _CurrentDestination.position 
+                    };
 
                     StartCoroutine(Move());
                 }

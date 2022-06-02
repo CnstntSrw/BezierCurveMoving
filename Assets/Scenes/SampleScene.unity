@@ -1280,7 +1280,8 @@ MonoBehaviour:
   LayerMask:
     serializedVersion: 2
     m_Bits: 64
-  _Speed: 0.5
+  _MovementSpeed: 0.5
+  _RotationSpeed: 0.1
   _Cubes1:
   - {fileID: 2015569757}
   - {fileID: 4495885}
@@ -1289,7 +1290,6 @@ MonoBehaviour:
   - {fileID: 1605690749}
   - {fileID: 1915125862}
   - {fileID: 1765638937}
-  _Duration: 0
 --- !u!1 &1765638933
 GameObject:
   m_ObjectHideFlags: 0
